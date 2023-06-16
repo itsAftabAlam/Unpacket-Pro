@@ -38,6 +38,7 @@ public class GUI extends Thread implements ActionListener {
     static JTextArea dataField;
     static JScrollPane scrollData;
     static JScrollPane scrollDetails;
+    static JFileChooser fileChooser;
     @Override
     public void run() {
         System.out.println("Reached outside run");
@@ -104,6 +105,34 @@ public class GUI extends Thread implements ActionListener {
         else if(Thread.currentThread().getName().equals("thread-filter")){
             filterNotEnabled = false;
         }
+        else if(Thread.currentThread().getName().equals("thread-save")){
+            if(handle==null) JOptionPane.showMessageDialog(frame,"No Packets! Choose a NIC and Capture","Alert",JOptionPane.WARNING_MESSAGE);
+            else{
+                int option = fileChooser.showDialog(frame,"Select File");
+                if (option == JFileChooser.APPROVE_OPTION) {
+                    String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+                    PcapDumper dumper;
+                    try {
+                        dumper = handle.dumpOpen(filePath);
+                    } catch (PcapNativeException | NotOpenException e) {
+                        throw new RuntimeException(e);
+                    }
+                    for (PcapPacket packet : packetList) {
+                        try {
+                            dumper.dump(packet, packet.getTimestamp());
+                        } catch (NotOpenException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    try {
+                        dumper.flush();
+                    } catch (PcapNativeException | NotOpenException e) {
+                        throw new RuntimeException(e);
+                    }
+                    dumper.close();
+                }
+            }
+        }
     }
 
     @Override
@@ -125,6 +154,11 @@ public class GUI extends Thread implements ActionListener {
             GUI t3 = new GUI();
             t3.setName("thread-filter");
             t3.start();
+        }
+        else if(e.getSource() == save){
+            GUI t4 = new GUI();
+            t4.setName("thread-save");
+            t4.start();
         }
     }
     public void gui() throws IOException {
@@ -174,6 +208,7 @@ public class GUI extends Thread implements ActionListener {
         dataField.setLineWrap(true);
         scrollData = new JScrollPane(dataField);
         scrollData.setBounds(10,465,frame.getWidth()-35,150);
+        fileChooser = new JFileChooser();
 
         //adding components to frame
         frame.add(interfaceLabel);

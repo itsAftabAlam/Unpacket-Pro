@@ -1,6 +1,7 @@
 import org.pcap4j.core.*;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -126,6 +127,7 @@ public class GUI extends Thread implements ActionListener {
 
         //creating components
         frame  = new JFrame("Packet Sniffer");
+        frame.getContentPane().setBackground(new Color(218, 245, 218));
         frame.setBounds(50,50,900,650);
         interfaceLabel = new JLabel("Choose NIC:");
         interfaceLabel.setBounds(10,10,80,20);
@@ -134,10 +136,13 @@ public class GUI extends Thread implements ActionListener {
         interfaceChoice.setBounds(113,10,300,20);
         start = new JButton("Start");
         start.setBounds(425,10,70,20);
+        start.setBackground(new Color(212, 234, 250));
         stop = new JButton("Stop");
         stop.setBounds(510,10,70,20);
+        stop.setBackground(new Color(212, 234, 250));
         save = new JButton("Save");
         save.setBounds(595,10,70,20);
+        save.setBackground(new Color(212, 234, 250));
         filterL = new JLabel("Select Filter:");
         filterL.setBounds(10,40,80,20);
         filterSelect = new JComboBox<>(filterOptions);
@@ -145,8 +150,10 @@ public class GUI extends Thread implements ActionListener {
         filterText = new JTextField();
         filterText.setBounds(250,40,100,20);
         filter = new JButton("Filter");
+        filter.setBackground(new Color(212, 234, 250));
         filter.setBounds(355,40,80,20);
         table = new JTable(data,col);
+        table.setBackground(new Color(252, 251, 251));
         scrollPane = new JScrollPane(table);
         scrollPane.setBounds(10,70,frame.getWidth()-35,200);
         details = new JTextArea();

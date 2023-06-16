@@ -8,8 +8,13 @@ public class PacketDetails {
             int end = s.indexOf(" ",start);
             return s.substring(start,end);
         }
-        else{
+        else if(s.contains("IPv6 Header")){
             int start = s.indexOf("Source address",s.indexOf("IPv6 Header"))+17;
+            int end = s.indexOf(" ",start);
+            return s.substring(start,end);
+        }
+        else{
+            int start = s.indexOf("Source address",s.indexOf("Ethernet Header"))+16;
             int end = s.indexOf(" ",start);
             return s.substring(start,end);
         }
@@ -22,9 +27,14 @@ public class PacketDetails {
             int end = Math.min(s.indexOf(" ",start),s.indexOf("[",start));
             return s.substring(start,end);
         }
-        else{
+        else if(s.contains("IPv6 Header")){
             int start = s.indexOf("Destination address",s.indexOf("IPv6 Header"))+22;
             int end = Math.min(s.indexOf(" ",start),s.indexOf("[",start));
+            return s.substring(start,end);
+        }
+        else{
+            int start = s.indexOf("Destination address",s.indexOf("Ethernet Header"))+21;
+            int end = Math.min(s.indexOf(" ",start),s.indexOf(" ",start));
             return s.substring(start,end);
         }
     }
@@ -37,6 +47,7 @@ public class PacketDetails {
         else if(s.contains("ICMP")) return "ICMP";
         else if(s.contains("TLS")) return "TLS";
         else if(s.contains("ARP")) return "ARP";
+        else if(s.contains("DNS")) return "DNS";
         else return " ";
     }
 

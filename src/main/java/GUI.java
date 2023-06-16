@@ -1,6 +1,8 @@
 import org.pcap4j.core.*;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,6 +11,7 @@ import java.io.IOException;
 import static java.lang.System.exit;
 
 public class GUI extends Thread implements ActionListener {
+    static PcapPacket[] packetList = new PcapPacket[100000];
     static boolean capture = true;
     static boolean filterNotEnabled = true;
     static Thread startTemp = null;
@@ -65,12 +68,13 @@ public class GUI extends Thread implements ActionListener {
                 public void gotPacket(PcapPacket packet) {
                     // Overriding the default gotPacket() function
                     if(capture && (filterNotEnabled || PacketDetails.isFilterTrue(packet))){
+                        packetList[sno] = packet;
                         String time = packet.getTimestamp().toString();
                         String source = PacketDetails.getSource(packet);
                         String des = PacketDetails.getDestination(packet);
                         String protocol = PacketDetails.getProtocol(packet);
                         String length = PacketDetails.getLength(packet);
-//                    System.out.println(packet);
+                    System.out.println(packet);
                         data[sno][0] = Integer.toString(sno+1);
                         data[sno][1] = time;
                         data[sno][2] = source;
@@ -128,7 +132,7 @@ public class GUI extends Thread implements ActionListener {
         //creating components
         frame  = new JFrame("Packet Sniffer");
         frame.getContentPane().setBackground(new Color(218, 245, 218));
-        frame.setBounds(50,50,900,650);
+        frame.setBounds(50,50,1000,700);
         interfaceLabel = new JLabel("Choose NIC:");
         interfaceLabel.setBounds(10,10,80,20);
         String[] choices = NIC.getNICNames(NIC.getNIC());
@@ -158,10 +162,11 @@ public class GUI extends Thread implements ActionListener {
         scrollPane.setBounds(10,70,frame.getWidth()-35,200);
         details = new JTextArea();
         scrollDetails = new JScrollPane(details);
-        scrollDetails.setBounds(10,280,frame.getWidth()-35,150);
+        scrollDetails.setBounds(10,300,frame.getWidth()-35,150);
         dataField = new JTextArea();
+        dataField.setLineWrap(true);
         scrollData = new JScrollPane(dataField);
-        scrollData.setBounds(10,440,frame.getWidth()-35,150);
+        scrollData.setBounds(10,465,frame.getWidth()-35,150);
 
         //adding components to frame
         frame.add(interfaceLabel);
@@ -188,5 +193,19 @@ public class GUI extends Thread implements ActionListener {
         frame.setResizable(false);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        //adding event handling for table
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        ListSelectionModel model = table.getSelectionModel();
+        model.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                int rowIndex = table.getSelectedRow();
+                if(!e.getValueIsAdjusting() && rowIndex!=-1){
+                    PacketDetails.setDataField(packetList[rowIndex]);
+                    PacketDetails.setDetails(packetList[rowIndex]);
+                }
+            }
+        });
     }
 }

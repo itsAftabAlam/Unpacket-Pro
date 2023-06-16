@@ -3,16 +3,30 @@ import org.pcap4j.core.PcapPacket;
 public class PacketDetails {
     public static String getSource(PcapPacket packet) {
         String s = packet.toString();
-        int start = s.indexOf("Source address:")+16;
-        int end = s.indexOf(" ",start);
-        return s.substring(start,end);
+        if(s.contains("IPv4 Header")){
+            int start = s.indexOf("Source address",s.indexOf("IPv4 Header"))+17;
+            int end = s.indexOf(" ",start);
+            return s.substring(start,end);
+        }
+        else{
+            int start = s.indexOf("Source address",s.indexOf("IPv6 Header"))+17;
+            int end = s.indexOf(" ",start);
+            return s.substring(start,end);
+        }
     }
 
     public static String getDestination(PcapPacket packet) {
         String s = packet.toString();
-        int start = s.indexOf("Destination address:")+21;
-        int end = s.indexOf(" ",start);
-        return s.substring(start,end);
+        if(s.contains("IPv4 Header")){
+            int start = s.indexOf("Destination address",s.indexOf("IPv4 Header"))+22;
+            int end = Math.min(s.indexOf(" ",start),s.indexOf("[",start));
+            return s.substring(start,end);
+        }
+        else{
+            int start = s.indexOf("Destination address",s.indexOf("IPv6 Header"))+22;
+            int end = Math.min(s.indexOf(" ",start),s.indexOf("[",start));
+            return s.substring(start,end);
+        }
     }
 
     public static String getProtocol(PcapPacket packet) {
@@ -55,5 +69,20 @@ public class PacketDetails {
             return filterItem.equals(getLength(packet));
         }
         return false;
+    }
+
+    public static void setDataField(PcapPacket packet) {
+        int startIndex = packet.toString().indexOf("Hex stream");
+        int endIndex = packet.toString().length();
+        String data = packet.toString().substring(startIndex,endIndex);
+        GUI.dataField.setText(data);
+        GUI.dataField.updateUI();
+    }
+
+    public static void setDetails(PcapPacket packet) {
+        int endIndex = packet.toString().indexOf("Hex stream");
+        String details = packet.toString().substring(0,endIndex);
+        GUI.details.setText(details);
+        GUI.details.updateUI();
     }
 }

@@ -3,6 +3,7 @@ import org.pcap4j.core.*;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -158,6 +159,12 @@ public class GUI extends Thread implements ActionListener {
         filter.setBounds(355,40,80,20);
         table = new JTable(data,col);
         table.setBackground(new Color(252, 251, 251));
+        // Setting default column sizes
+        int[] colSize = {80,190,250,250,90,90};
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            TableColumn column = table.getColumnModel().getColumn(i);
+            column.setPreferredWidth(colSize[i]);
+        }
         scrollPane = new JScrollPane(table);
         scrollPane.setBounds(10,70,frame.getWidth()-35,200);
         details = new JTextArea();

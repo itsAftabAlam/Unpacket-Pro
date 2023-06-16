@@ -32,4 +32,28 @@ public class PacketDetails {
         int end = s.indexOf(" ",start);
         return s.substring(start,end);
     }
+
+    public static boolean isFilterTrue(PcapPacket packet){
+        int index = GUI.filterSelect.getSelectedIndex();
+        String filterItem = GUI.filterText.getText();
+        if(index==0){
+            return filterItem.equals(Integer.toString(GUI.sno));
+        }
+        else if(index==1){
+            return filterItem.equals(packet.getTimestamp().toString());
+        }
+        else if(index==2){
+            return filterItem.equals(getSource(packet));
+        }
+        else if(index==3){
+            return filterItem.equals(getDestination(packet));
+        }
+        else if(index==4){
+            return filterItem.equals(getProtocol(packet));
+        }
+        else if(index==5){
+            return filterItem.equals(getLength(packet));
+        }
+        return false;
+    }
 }

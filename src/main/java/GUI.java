@@ -9,11 +9,12 @@ import static java.lang.System.exit;
 
 public class GUI extends Thread implements ActionListener {
     static boolean capture = true;
+    static boolean filterNotEnabled = true;
     static Thread startTemp = null;
     static String[] col = {"S.No","Time","Source","Destination","Protocol","Length"};
+    static String[] filterOptions = {"S.No","Time","Source","Destination","Protocol","Length"};
     static int sno = 0;
     static String[][] data = new String[100000][6];
-    static String[][] filterData = new String[10000][6];
     static PcapNetworkInterface selectedNIC = null;
     static PcapHandle handle= null;
     static JFrame frame;
@@ -62,7 +63,7 @@ public class GUI extends Thread implements ActionListener {
                 @Override
                 public void gotPacket(PcapPacket packet) {
                     // Overriding the default gotPacket() function
-                    if(capture){
+                    if(capture && (filterNotEnabled || PacketDetails.isFilterTrue(packet))){
                         String time = packet.getTimestamp().toString();
                         String source = PacketDetails.getSource(packet);
                         String des = PacketDetails.getDestination(packet);
@@ -82,8 +83,6 @@ public class GUI extends Thread implements ActionListener {
                 }
             };
 
-
-
             // telling the handle to loop using the listener we created
             try {
                 int maxPackets = 5000;
@@ -97,26 +96,13 @@ public class GUI extends Thread implements ActionListener {
             capture = false;
         }
         else if(Thread.currentThread().getName().equals("thread-filter")){
-            int index = filterSelect.getSelectedIndex();
-            String filterItem = filterText.getText();
-            System.out.println(index+filterItem);
-            int sno = 0;
-            for(int i = 0; i< data.length; i++){
-                if(data[i][index].equals(filterItem)){
-                    sno++;
-                    filterData[sno] = data[i];
-                    JTable filterTable = new JTable(filterData,col);
-                    scrollPane = new JScrollPane(filterTable);
-                    scrollPane.setBounds(10,70,frame.getWidth()-35,200);
-                    frame.add(scrollPane);
-                }
-            }
+            filterNotEnabled = false;
         }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() ==start){
+        if(e.getSource() == start){
             System.out.println("Reached start thread in action performed");
             GUI t1 = new GUI();
             t1.setName("thread-start");
@@ -124,12 +110,12 @@ public class GUI extends Thread implements ActionListener {
             t1.start();
             System.out.println("Reached end of action performed");
         }
-        else if(e.getSource() ==stop){
+        else if(e.getSource() == stop){
             GUI t2 = new GUI();
             t2.setName("thread-stop");
             t2.start();
         }
-        else if(e.getSource() ==filter){
+        else if(e.getSource() == filter){
             GUI t3 = new GUI();
             t3.setName("thread-filter");
             t3.start();
@@ -154,7 +140,7 @@ public class GUI extends Thread implements ActionListener {
         save.setBounds(595,10,70,20);
         filterL = new JLabel("Select Filter:");
         filterL.setBounds(10,40,80,20);
-        filterSelect = new JComboBox<>(col);
+        filterSelect = new JComboBox<>(filterOptions);
         filterSelect.setBounds(95,40,150,20);
         filterText = new JTextField();
         filterText.setBounds(250,40,100,20);
@@ -188,6 +174,7 @@ public class GUI extends Thread implements ActionListener {
         start.addActionListener(this);
         stop.addActionListener(this);
         save.addActionListener(this);
+        filter.addActionListener(this);
 
         //frame properties
         frame.setLayout(null);

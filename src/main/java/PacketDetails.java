@@ -13,11 +13,17 @@ public class PacketDetails {
             int end = s.indexOf(" ",start);
             return s.substring(start,end);
         }
-        else{
+        else if(s.contains("Ethernet Header")){
             int start = s.indexOf("Source address",s.indexOf("Ethernet Header"))+16;
             int end = s.indexOf(" ",start);
             return s.substring(start,end);
         }
+        else if(s.contains("IGMP")){
+            int start = s.indexOf("Source address",s.indexOf("IGMP"))+16;
+            int end = s.indexOf(" ",start);
+            return s.substring(start,end);
+        }
+        else return " ";
     }
 
     public static String getDestination(PcapPacket packet) {
@@ -32,11 +38,17 @@ public class PacketDetails {
             int end = Math.min(s.indexOf(" ",start),s.indexOf("[",start));
             return s.substring(start,end);
         }
-        else{
+        else if(s.contains("Ethernet Header")){
             int start = s.indexOf("Destination address",s.indexOf("Ethernet Header"))+21;
             int end = Math.min(s.indexOf(" ",start),s.indexOf(" ",start));
             return s.substring(start,end);
         }
+        else if(s.contains("IGMP")){
+            int start = s.indexOf("Destination address",s.indexOf("IGMP"))+21;
+            int end = Math.min(s.indexOf(" ",start),s.indexOf(" ",start));
+            return s.substring(start,end);
+        }
+        else return " ";
     }
 
     public static String getProtocol(PcapPacket packet) {
@@ -48,6 +60,7 @@ public class PacketDetails {
         else if(s.contains("TLS")) return "TLS";
         else if(s.contains("ARP")) return "ARP";
         else if(s.contains("DNS")) return "DNS";
+        else if(s.contains("IGMP")) return "IGMP";
         else return " ";
     }
 

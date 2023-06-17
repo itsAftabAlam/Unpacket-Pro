@@ -12,6 +12,7 @@ import java.io.IOException;
 import static java.lang.System.exit;
 
 public class GUI extends Thread implements ActionListener {
+    static Color buttonColor = new Color(212, 234, 250);
     static int totalPackets = 1000000;
     static PcapPacket[] packetList = new PcapPacket[totalPackets];
     static boolean capture = true;
@@ -41,6 +42,7 @@ public class GUI extends Thread implements ActionListener {
     static JScrollPane scrollDetails;
     static JFileChooser fileChooser;
     static JButton analysis;
+    static JButton threshold;
     @Override
     public void run() {
         System.out.println("Reached outside run");
@@ -163,6 +165,40 @@ public class GUI extends Thread implements ActionListener {
             plotDialog.setLayout(null);
             plotDialog.setVisible(true);
         }
+        else if(Thread.currentThread().getName().equals("thread-threshold")){
+            JDialog thresholdDialog = new JDialog(frame,"Set Threshold Values",true);
+            thresholdDialog.setBounds(400,200,400,150);
+            JLabel thresholdValLabel = new JLabel("Set Max Number of Packets per IP: ");
+            thresholdValLabel.setBounds(10,10,200,20);
+            JTextField thresholdVal = new JTextField();
+            thresholdVal.setBounds(215,10,150,20);
+            JLabel thresholdPercentLabel = new JLabel("Set Max Percent of Packets per IP: ");
+            thresholdPercentLabel.setBounds(10,35,200,20);
+            JTextField thresholdPercent = new JTextField();
+            thresholdPercent.setBounds(215,35,150,20);
+            JButton ok = new JButton("OK");
+            ok.setBounds(160,70,60,20);
+            ok.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    thresholdDialog.dispose();
+                    int val = Integer.parseInt(thresholdVal.getText());
+                    double percent = Double.parseDouble(thresholdPercent.getText());
+                    RealTimeAnalysis.thresholdValue = val;
+                    if(percent>100){
+                        JOptionPane.showMessageDialog(thresholdDialog,"Percentage Should Be At Maximum 100","Alert",JOptionPane.WARNING_MESSAGE);
+                    }
+                    else RealTimeAnalysis.thresholdPercentage = percent;
+                }
+            });
+            thresholdDialog.add(thresholdValLabel);
+            thresholdDialog.add(thresholdVal);
+            thresholdDialog.add(thresholdPercent);
+            thresholdDialog.add(thresholdPercentLabel);
+            thresholdDialog.add(ok);
+            thresholdDialog.setLayout(null);
+            thresholdDialog.setVisible(true);
+        }
     }
 
     @Override
@@ -195,6 +231,11 @@ public class GUI extends Thread implements ActionListener {
             t5.setName("thread-analysis");
             t5.start();
         }
+        else if(e.getSource() == threshold){
+            GUI t6 = new GUI();
+            t6.setName("thread-threshold");
+            t6.start();
+        }
     }
     public void gui() throws IOException {
         System.out.println("In GUI");
@@ -210,13 +251,13 @@ public class GUI extends Thread implements ActionListener {
         interfaceChoice.setBounds(113,10,300,20);
         start = new JButton("Start");
         start.setBounds(425,10,70,20);
-        start.setBackground(new Color(212, 234, 250));
+        start.setBackground(buttonColor);
         stop = new JButton("Stop");
         stop.setBounds(510,10,70,20);
-        stop.setBackground(new Color(212, 234, 250));
+        stop.setBackground(buttonColor);
         save = new JButton("Save");
         save.setBounds(595,10,70,20);
-        save.setBackground(new Color(212, 234, 250));
+        save.setBackground(buttonColor);
         filterL = new JLabel("Select Filter:");
         filterL.setBounds(10,40,80,20);
         filterSelect = new JComboBox<>(filterOptions);
@@ -224,7 +265,7 @@ public class GUI extends Thread implements ActionListener {
         filterText = new JTextField();
         filterText.setBounds(250,40,100,20);
         filter = new JButton("Filter");
-        filter.setBackground(new Color(212, 234, 250));
+        filter.setBackground(buttonColor);
         filter.setBounds(355,40,80,20);
         table = new JTable(data,col);
         table.setBackground(new Color(252, 251, 251));
@@ -246,7 +287,10 @@ public class GUI extends Thread implements ActionListener {
         fileChooser = new JFileChooser();
         analysis = new JButton("Real Time Analysis");
         analysis.setBounds(10,625,140,20);
-        analysis.setBackground(new Color(212, 234, 250));
+        analysis.setBackground(buttonColor);
+        threshold = new JButton("Set Threshold");
+        threshold.setBounds(160,625,120,20);
+        threshold.setBackground(buttonColor);
         //adding components to frame
         frame.add(interfaceLabel);
         frame.add(interfaceChoice);
@@ -261,6 +305,7 @@ public class GUI extends Thread implements ActionListener {
         frame.add(scrollData);
         frame.add(scrollDetails);
         frame.add(analysis);
+        frame.add(threshold);
 
         //adding action listeners
         start.addActionListener(this);
@@ -268,6 +313,7 @@ public class GUI extends Thread implements ActionListener {
         save.addActionListener(this);
         filter.addActionListener(this);
         analysis.addActionListener(this);
+        threshold.addActionListener(this);
 
         //frame properties
         frame.setLayout(null);

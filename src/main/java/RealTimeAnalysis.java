@@ -1,3 +1,4 @@
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.ChartPanel;
@@ -6,7 +7,11 @@ import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PiePlot3D;
 import org.jfree.data.general.DefaultPieDataset;
 import org.pcap4j.core.PcapPacket;
-
+import java.awt.Toolkit;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,6 +19,13 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class RealTimeAnalysis {
+    //IPs crossing threshold
+    static HashSet<String> thresholdIP = new HashSet<>();
+    static int totalPackets = 0;
+    static int currentMaxValue = Integer.MIN_VALUE;
+    static double currentMaxPercent = 0;
+    static int thresholdValue = Integer.MAX_VALUE;
+    static double thresholdPercentage = 100;
     static int indexProtocol = 0;
     static int indexTalkers = 0;
     static int tcp = 0 ,udp = 0,https = 0,icmp = 0,igmp = 0,arp = 0,dns = 0;
@@ -32,20 +44,50 @@ public class RealTimeAnalysis {
     private static void setTalkersNumbers() {
         System.out.println("creating talkers chart");
         for(int i = indexTalkers ; i< indexTalkers+100 && i<GUI.data.length;i++){
+            totalPackets++;
             if(GUI.data[i][2]!=null){
                 String key = GUI.data[i][2];
-                int value = 0;
-                 if(talkersDataset.getIndex(key)!=-1) value = talkersDataset.getValue(key).intValue()+1;
+                int value = 1;
+                if(talkersDataset.getIndex(key)!=-1) value = talkersDataset.getValue(key).intValue()+1;
                 talkersDataset.setValue(key,value);
+                setMax(value);
+                alarm(key);
             }
             if(GUI.data[i][3]!=null){
                 String key = GUI.data[i][3];
                 int value = 0;
                 if(talkersDataset.getIndex(key)!=-1) value = talkersDataset.getValue(key).intValue()+1;
                 talkersDataset.setValue(key,value);
+                setMax(value);
+                alarm(key);
             }
         }
         indexTalkers += 100;
+    }
+
+    private static void setMax(int value) {
+        if(currentMaxValue<value) currentMaxValue=value;
+        double percentValue =  ((double)value/totalPackets)*100;
+        if(currentMaxPercent<percentValue) currentMaxPercent=percentValue;
+    }
+
+    static class Beep extends TimerTask {
+        @Override
+        public void run() {
+            Toolkit.getDefaultToolkit().beep();
+        }
+    }
+    private static void alarm(String key){
+        if(currentMaxValue>thresholdValue && currentMaxPercent>thresholdPercentage && !thresholdIP.contains(key)){
+            thresholdIP.add(key);
+            Timer timer = new Timer();
+            // Scheduling a TimerTask to beep every 1 second
+            timer.schedule(new Beep(), 0, 1000);
+            // Show the dialog box with the alert message
+            JOptionPane.showMessageDialog(null, "Alert! "+key+" Hit Threshold!","Alert",JOptionPane.WARNING_MESSAGE);
+            // Cancel the beeping task when the button is pressed
+            timer.cancel();
+        }
     }
 
     private static void getTopTalkers() {
@@ -57,7 +99,7 @@ public class RealTimeAnalysis {
         talkerPieChart.setBounds(100,100,500,500);
         talkerPieChart.setVisible(true);
         System.out.println("true frame");
-        Timer timer = new Timer(1000, new ActionListener() {
+        javax.swing.Timer timer = new javax.swing.Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setTalkersNumbers();
@@ -105,7 +147,7 @@ public class RealTimeAnalysis {
         ChartFrame pieChart = new ChartFrame("Protocol Distribution",chart);
         pieChart.setBounds(100,100,500,500);
         pieChart.setVisible(true);
-        Timer timer = new Timer(1000, new ActionListener() {
+        javax.swing.Timer timer = new javax.swing.Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setProtocolNumbers();

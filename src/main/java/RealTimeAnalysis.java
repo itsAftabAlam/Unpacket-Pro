@@ -31,11 +31,17 @@ public class RealTimeAnalysis {
 
     private static void setTalkersNumbers() {
         System.out.println("creating talkers chart");
-        for(int i = indexTalkers ; i< indexTalkers+100 && i<GUI.packetList.length;i++){
-            if(GUI.packetList[i]!=null){
-                String key = PacketDetails.getSource(GUI.packetList[i]);
+        for(int i = indexTalkers ; i< indexTalkers+100 && i<GUI.data.length;i++){
+            if(GUI.data[i][2]!=null){
+                String key = GUI.data[i][2];
                 int value = 0;
-                if(talkersDataset.getValue(key)!=null) value = talkersDataset.getValue(key).intValue()+1;
+                 if(talkersDataset.getIndex(key)!=-1) value = talkersDataset.getValue(key).intValue()+1;
+                talkersDataset.setValue(key,value);
+            }
+            if(GUI.data[i][3]!=null){
+                String key = GUI.data[i][3];
+                int value = 0;
+                if(talkersDataset.getIndex(key)!=-1) value = talkersDataset.getValue(key).intValue()+1;
                 talkersDataset.setValue(key,value);
             }
         }
@@ -44,21 +50,23 @@ public class RealTimeAnalysis {
 
     private static void getTopTalkers() {
         setTalkersNumbers();
-        JFreeChart chart = ChartFactory.createPieChart("Top Talkers",talkersDataset,true,true,false);
-        PiePlot pie= (PiePlot) chart.getPlot();
-        ChartFrame pieChart = new ChartFrame("Top Talkers",chart);
-        pieChart.setBounds(100,100,500,500);
-        pieChart.setVisible(true);
+        JFreeChart talkerChart = ChartFactory.createPieChart("Top Talkers",talkersDataset,true,true,false);
+        PiePlot pie= (PiePlot) talkerChart.getPlot();
+        System.out.println("before frame");
+        ChartFrame talkerPieChart = new ChartFrame("Top Talkers",talkerChart);
+        talkerPieChart.setBounds(100,100,500,500);
+        talkerPieChart.setVisible(true);
+        System.out.println("true frame");
         Timer timer = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setTalkersNumbers();
-                pieChart.repaint();;
+                talkerPieChart.repaint();;
             }
         });
         timer.setRepeats(true);
         timer.start();
-        pieChart.addWindowListener(new WindowAdapter() {
+        talkerPieChart.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 timer.stop();

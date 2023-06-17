@@ -12,7 +12,7 @@ import java.io.IOException;
 import static java.lang.System.exit;
 
 public class GUI extends Thread implements ActionListener {
-    static int totalPackets = 10000;
+    static int totalPackets = 1000000;
     static PcapPacket[] packetList = new PcapPacket[totalPackets];
     static boolean capture = true;
     static boolean filterNotEnabled = true;
@@ -141,7 +141,7 @@ public class GUI extends Thread implements ActionListener {
             plotDialog.setBounds(400,200,300,200);
             JLabel plotLabel = new JLabel("Select: ");
             plotLabel.setBounds(10,10,50,20);
-            String[] plotOptions = {"Network Throughput","Top Talkers","Traffic Distribution","Protocol Distribution"};
+            String[] plotOptions = {"Network Throughput","Top Talkers","Protocol Distribution"};
             JComboBox<String> plotSelection = new JComboBox<>(plotOptions);
             //description later
             plotSelection.setBounds(65,10,200,20);

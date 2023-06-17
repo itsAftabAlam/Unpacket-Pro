@@ -12,14 +12,15 @@ import java.io.IOException;
 import static java.lang.System.exit;
 
 public class GUI extends Thread implements ActionListener {
-    static PcapPacket[] packetList = new PcapPacket[100000];
+    static int totalPackets = 10000;
+    static PcapPacket[] packetList = new PcapPacket[totalPackets];
     static boolean capture = true;
     static boolean filterNotEnabled = true;
     static Thread startTemp = null;
     static String[] col = {"S.No","Time","Source","Destination","Protocol","Length"};
     static String[] filterOptions = {"S.No","Time","Source","Destination","Protocol","Length"};
     static int sno = 0;
-    static String[][] data = new String[100000][6];
+    static String[][] data = new String[totalPackets][6];
     static PcapNetworkInterface selectedNIC = null;
     static PcapHandle handle= null;
     static JFrame frame;
@@ -39,6 +40,7 @@ public class GUI extends Thread implements ActionListener {
     static JScrollPane scrollData;
     static JScrollPane scrollDetails;
     static JFileChooser fileChooser;
+    static JButton analysis;
     @Override
     public void run() {
         System.out.println("Reached outside run");
@@ -76,7 +78,7 @@ public class GUI extends Thread implements ActionListener {
                         String des = PacketDetails.getDestination(packet);
                         String protocol = PacketDetails.getProtocol(packet);
                         String length = PacketDetails.getLength(packet);
-                    System.out.println(packet);
+//                    System.out.println(packet);
                         data[sno][0] = Integer.toString(sno+1);
                         data[sno][1] = time;
                         data[sno][2] = source;
@@ -92,7 +94,7 @@ public class GUI extends Thread implements ActionListener {
 
             // telling the handle to loop using the listener we created
             try {
-                int maxPackets = 5000;
+                int maxPackets = totalPackets;
                 handle.loop(maxPackets, listener);
             } catch (InterruptedException | PcapNativeException | NotOpenException ex) {
                 ex.printStackTrace();
@@ -133,6 +135,33 @@ public class GUI extends Thread implements ActionListener {
                 }
             }
         }
+        else if(Thread.currentThread().getName().equals("thread-analysis")){
+            System.out.println("reached analysis thread");
+            JDialog plotDialog = new JDialog(frame,"Real Time Analysis Menu",true);
+            plotDialog.setBounds(400,200,300,200);
+            JLabel plotLabel = new JLabel("Select: ");
+            plotLabel.setBounds(10,10,50,20);
+            String[] plotOptions = {"Network Throughput","Top Talkers","Top Protocol","Traffic Distribution","Protocol Distribution"};
+            JComboBox<String> plotSelection = new JComboBox<>(plotOptions);
+            //description later
+            plotSelection.setBounds(65,10,200,20);
+            JButton ok = new JButton("OK");
+            ok.setBounds(130,35,60,20);
+            ok.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    plotDialog.dispose();
+                    String selectedPlot = (String) plotSelection.getSelectedItem();
+                    System.out.println(selectedPlot);
+//                    RealTimeAnalysis.chartPlot(selectedPlot);
+                }
+            });
+            plotDialog.add(plotLabel);
+            plotDialog.add(plotSelection);
+            plotDialog.add(ok);
+            plotDialog.setLayout(null);
+            plotDialog.setVisible(true);
+        }
     }
 
     @Override
@@ -159,6 +188,11 @@ public class GUI extends Thread implements ActionListener {
             GUI t4 = new GUI();
             t4.setName("thread-save");
             t4.start();
+        }
+        else if(e.getSource() == analysis){
+            GUI t5 = new GUI();
+            t5.setName("thread-analysis");
+            t5.start();
         }
     }
     public void gui() throws IOException {
@@ -209,7 +243,9 @@ public class GUI extends Thread implements ActionListener {
         scrollData = new JScrollPane(dataField);
         scrollData.setBounds(10,465,frame.getWidth()-35,150);
         fileChooser = new JFileChooser();
-
+        analysis = new JButton("Real Time Analysis");
+        analysis.setBounds(10,625,140,20);
+        analysis.setBackground(new Color(212, 234, 250));
         //adding components to frame
         frame.add(interfaceLabel);
         frame.add(interfaceChoice);
@@ -223,12 +259,14 @@ public class GUI extends Thread implements ActionListener {
         frame.add(scrollPane);
         frame.add(scrollData);
         frame.add(scrollDetails);
+        frame.add(analysis);
 
         //adding action listeners
         start.addActionListener(this);
         stop.addActionListener(this);
         save.addActionListener(this);
         filter.addActionListener(this);
+        analysis.addActionListener(this);
 
         //frame properties
         frame.setLayout(null);

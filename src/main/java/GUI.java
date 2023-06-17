@@ -141,7 +141,7 @@ public class GUI extends Thread implements ActionListener {
             plotDialog.setBounds(400,200,300,200);
             JLabel plotLabel = new JLabel("Select: ");
             plotLabel.setBounds(10,10,50,20);
-            String[] plotOptions = {"Network Throughput","Top Talkers","Top Protocol","Traffic Distribution","Protocol Distribution"};
+            String[] plotOptions = {"Network Throughput","Top Talkers","Traffic Distribution","Protocol Distribution"};
             JComboBox<String> plotSelection = new JComboBox<>(plotOptions);
             //description later
             plotSelection.setBounds(65,10,200,20);
@@ -153,7 +153,8 @@ public class GUI extends Thread implements ActionListener {
                     plotDialog.dispose();
                     String selectedPlot = (String) plotSelection.getSelectedItem();
                     System.out.println(selectedPlot);
-//                    RealTimeAnalysis.chartPlot(selectedPlot);
+                    assert selectedPlot != null;
+                    RealTimeAnalysis.chartPlot(selectedPlot);
                 }
             });
             plotDialog.add(plotLabel);

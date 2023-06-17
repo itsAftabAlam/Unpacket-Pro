@@ -14,28 +14,73 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class RealTimeAnalysis {
-    static int index = 0;
+    static int indexProtocol = 0;
+    static int indexTalkers = 0;
     static int tcp = 0 ,udp = 0,https = 0,icmp = 0,igmp = 0,arp = 0,dns = 0;
+    static DefaultPieDataset<String> talkersDataset = new DefaultPieDataset<>();
     public static void chartPlot(String item){
         System.out.println("called");
         if(item.equals("Protocol Distribution")){
             getProtocolDistribution();
         }
+        else if (item.equals("Top Talkers")){
+            System.out.println("talk talkers called");
+            getTopTalkers();
+        }
     }
-    private static void setProtocolNumbers() {
-        System.out.println("creating chart");
-        for(int i = index ; i< index+100 && i<GUI.packetList.length;i++){
+
+    private static void setTalkersNumbers() {
+        System.out.println("creating talkers chart");
+        for(int i = indexTalkers ; i< indexTalkers+100 && i<GUI.packetList.length;i++){
             if(GUI.packetList[i]!=null){
-                if(GUI.packetList[i].toString().contains("TCP")) tcp++;
-                if(GUI.packetList[i].toString().contains("UDP")) udp++;
-                if(GUI.packetList[i].toString().contains("HTTPS")) https++;
-                if(GUI.packetList[i].toString().contains("ICMP")) icmp++;
-                if(GUI.packetList[i].toString().contains("IGMP")) igmp++;
-                if(GUI.packetList[i].toString().contains("ARP")) arp++;
-                if(GUI.packetList[i].toString().contains("DNS")) dns++;
+                String key = PacketDetails.getSource(GUI.packetList[i]);
+                int value = 0;
+                if(talkersDataset.getValue(key)!=null) value = talkersDataset.getValue(key).intValue()+1;
+                talkersDataset.setValue(key,value);
             }
         }
-        index += 100;
+        indexTalkers += 100;
+    }
+
+    private static void getTopTalkers() {
+        setTalkersNumbers();
+        JFreeChart chart = ChartFactory.createPieChart("Top Talkers",talkersDataset,true,true,false);
+        PiePlot pie= (PiePlot) chart.getPlot();
+        ChartFrame pieChart = new ChartFrame("Top Talkers",chart);
+        pieChart.setBounds(100,100,500,500);
+        pieChart.setVisible(true);
+        Timer timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setTalkersNumbers();
+                pieChart.repaint();;
+            }
+        });
+        timer.setRepeats(true);
+        timer.start();
+        pieChart.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                timer.stop();
+            }
+        });
+    }
+
+    private static void setProtocolNumbers() {
+        System.out.println("creating chart");
+        for(int i = indexProtocol ; i< indexProtocol+100 && i<GUI.data.length;i++){
+            if(GUI.data[i][4]!=null){
+                System.out.println(GUI.data[i][5]);
+                if(GUI.data[i][4].equals("TCP")) tcp++;
+                if(GUI.data[i][4].equals("UDP")) udp++;
+                if(GUI.data[i][4].equals("HTTPS")) https++;
+                if(GUI.data[i][4].equals("ICMP")) icmp++;
+                if(GUI.data[i][4].equals("IGMP")) igmp++;
+                if(GUI.data[i][4].equals("ARP")) arp++;
+                if(GUI.data[i][4].equals("DNS")) dns++;
+            }
+        }
+        indexProtocol += 100;
     }
     private static void getProtocolDistribution(){
         setProtocolNumbers();

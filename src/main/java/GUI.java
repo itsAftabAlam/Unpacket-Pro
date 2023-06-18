@@ -1,5 +1,4 @@
 import org.pcap4j.core.*;
-
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -140,15 +139,15 @@ public class GUI extends Thread implements ActionListener {
         else if(Thread.currentThread().getName().equals("thread-analysis")){
             System.out.println("reached analysis thread");
             JDialog plotDialog = new JDialog(frame,"Real Time Analysis Menu",true);
-            plotDialog.setBounds(400,200,300,200);
+            plotDialog.setBounds(400,200,300,140);
             JLabel plotLabel = new JLabel("Select: ");
             plotLabel.setBounds(10,10,50,20);
             String[] plotOptions = {"Network Throughput","Top Talkers","Protocol Distribution"};
             JComboBox<String> plotSelection = new JComboBox<>(plotOptions);
             //description later
-            plotSelection.setBounds(65,10,200,20);
+            plotSelection.setBounds(62,10,200,20);
             JButton ok = new JButton("OK");
-            ok.setBounds(130,35,60,20);
+            ok.setBounds(130,45,60,20);
             ok.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {

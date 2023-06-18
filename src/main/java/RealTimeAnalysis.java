@@ -1,24 +1,28 @@
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PiePlot;
-import org.jfree.chart.plot.PiePlot3D;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.general.DefaultPieDataset;
-import org.pcap4j.core.PcapPacket;
+import org.jfree.data.time.Second;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
 import java.awt.Toolkit;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Date;
+import java.util.HashSet;
 
 public class RealTimeAnalysis {
+    static Date start = Date.from(GUI.packetList[0].getTimestamp());
+    static Date current = start;
+    static long totalSize = 0;
+    static int indexThroughput = 0;
+
     //IPs crossing threshold
     static HashSet<String> thresholdIP = new HashSet<>();
     static int totalPackets = 0;
@@ -39,6 +43,56 @@ public class RealTimeAnalysis {
             System.out.println("talk talkers called");
             getTopTalkers();
         }
+        else if (item.equals("Network Throughput")){
+            System.out.println("network throughput called");
+            getNetworkThroughput();
+        }
+    }
+
+    public static void setThroughput(){
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + 998;
+
+        while (System.currentTimeMillis() < endTime && GUI.data[indexThroughput][5]!=null ) {
+            current = Date.from(GUI.packetList[indexThroughput].getTimestamp());
+            totalSize += Integer.parseInt(GUI.data[indexThroughput][5]);
+            indexThroughput++;
+        }
+    }
+    private static void getNetworkThroughput() {
+        TimeSeries throughputSeries = new TimeSeries("Throughput");
+        throughputSeries.addOrUpdate(new Second(start),0);
+        TimeSeriesCollection collection = new TimeSeriesCollection();
+        collection.addSeries(throughputSeries);
+        JFreeChart throughputChart = ChartFactory.createTimeSeriesChart("Network Throughput", "Time", "Throughput (bytes/sec)", collection);
+        XYPlot plot = (XYPlot)throughputChart.getPlot();
+        ChartFrame throughputFrame = new ChartFrame("Throughput Chart",throughputChart);
+        throughputFrame.setBounds(100,100,700,700);
+        System.out.println("Creating plot");
+        throughputFrame.setVisible(true);
+        javax.swing.Timer timer = new javax.swing.Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(GUI.packetList[indexThroughput]!=null){
+                    setThroughput();
+                    Date curr = current;
+                    Second currentSecond = new Second(curr);
+                    //time elapsed in seconds
+                    long timeElapsed = (curr.getTime()- start.getTime())/1000;
+                    throughputSeries.addOrUpdate(currentSecond,(double)totalSize/timeElapsed);
+                    System.out.println(timeElapsed);
+                    throughputFrame.repaint();
+                }
+            }
+        });
+        timer.setRepeats(true);
+        timer.start();
+        throughputFrame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                timer.stop();
+            }
+        });
     }
 
     private static void setTalkersNumbers() {
@@ -80,7 +134,7 @@ public class RealTimeAnalysis {
     private static void alarm(String key){
         if(currentMaxValue>thresholdValue && currentMaxPercent>thresholdPercentage && !thresholdIP.contains(key)){
             thresholdIP.add(key);
-            Timer timer = new Timer();
+            java.util.Timer timer = new java.util.Timer();
             // Scheduling a TimerTask to beep every 1 second
             timer.schedule(new Beep(), 0, 1000);
             // Show the dialog box with the alert message
@@ -170,5 +224,4 @@ public class RealTimeAnalysis {
             }
         });
     }
-
 }

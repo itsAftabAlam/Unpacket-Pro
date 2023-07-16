@@ -44,11 +44,9 @@ public class GUI extends Thread implements ActionListener {
     static JButton threshold;
     @Override
     public void run() {
-        System.out.println("Reached outside run");
         if(Thread.currentThread().getName().equals("thread-start")){
             capture = true;
-            System.out.println("Reached Start Thread");
-            System.out.println(interfaceChoice);
+//            System.out.println(interfaceChoice);
             String s = (String) interfaceChoice.getSelectedItem();
             try {
                 selectedNIC = NIC.getSelectedNIC(NIC.getNIC(),s);
@@ -137,7 +135,6 @@ public class GUI extends Thread implements ActionListener {
             }
         }
         else if(Thread.currentThread().getName().equals("thread-analysis")){
-            System.out.println("reached analysis thread");
             JDialog plotDialog = new JDialog(frame,"Real Time Analysis Menu",true);
             plotDialog.setBounds(400,200,300,140);
             JLabel plotLabel = new JLabel("Select: ");
@@ -153,7 +150,7 @@ public class GUI extends Thread implements ActionListener {
                 public void actionPerformed(ActionEvent e) {
                     plotDialog.dispose();
                     String selectedPlot = (String) plotSelection.getSelectedItem();
-                    System.out.println(selectedPlot);
+//                    System.out.println(selectedPlot);
                     assert selectedPlot != null;
                     RealTimeAnalysis.chartPlot(selectedPlot);
                 }
@@ -203,12 +200,10 @@ public class GUI extends Thread implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == start){
-            System.out.println("Reached start thread in action performed");
             GUI t1 = new GUI();
             t1.setName("thread-start");
             startTemp = t1;
             t1.start();
-            System.out.println("Reached end of action performed");
         }
         else if(e.getSource() == stop){
             GUI t2 = new GUI();
@@ -237,10 +232,9 @@ public class GUI extends Thread implements ActionListener {
         }
     }
     public void gui() throws IOException {
-        System.out.println("In GUI");
 
         //creating components
-        frame  = new JFrame("Packet Sniffer");
+        frame  = new JFrame("Unpacket Pro");
         frame.getContentPane().setBackground(new Color(218, 245, 218));
         frame.setBounds(50,50,1000,700);
         interfaceLabel = new JLabel("Choose NIC:");

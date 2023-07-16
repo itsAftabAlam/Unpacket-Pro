@@ -35,16 +35,13 @@ public class RealTimeAnalysis {
     static int tcp = 0 ,udp = 0,https = 0,icmp = 0,igmp = 0,arp = 0,dns = 0;
     static DefaultPieDataset<String> talkersDataset = new DefaultPieDataset<>();
     public static void chartPlot(String item){
-        System.out.println("called");
         if(item.equals("Protocol Distribution")){
             getProtocolDistribution();
         }
         else if (item.equals("Top Talkers")){
-            System.out.println("talk talkers called");
             getTopTalkers();
         }
         else if (item.equals("Network Throughput")){
-            System.out.println("network throughput called");
             getNetworkThroughput();
         }
     }
@@ -68,7 +65,7 @@ public class RealTimeAnalysis {
         XYPlot plot = (XYPlot)throughputChart.getPlot();
         ChartFrame throughputFrame = new ChartFrame("Throughput Chart",throughputChart);
         throughputFrame.setBounds(100,100,700,700);
-        System.out.println("Creating plot");
+        //Creating plot
         throughputFrame.setVisible(true);
         javax.swing.Timer timer = new javax.swing.Timer(1000, new ActionListener() {
             @Override
@@ -80,7 +77,7 @@ public class RealTimeAnalysis {
                     //time elapsed in seconds
                     long timeElapsed = (curr.getTime()- start.getTime())/1000;
                     throughputSeries.addOrUpdate(currentSecond,(double)totalSize/timeElapsed);
-                    System.out.println(timeElapsed);
+//                    System.out.println(timeElapsed);
                     throughputFrame.repaint();
                 }
             }
@@ -96,7 +93,7 @@ public class RealTimeAnalysis {
     }
 
     private static void setTalkersNumbers() {
-        System.out.println("creating talkers chart");
+        //creating talkers chart
         for(int i = indexTalkers ; i< indexTalkers+100 && i<GUI.data.length;i++){
             totalPackets++;
             if(GUI.data[i][2]!=null){
@@ -148,11 +145,9 @@ public class RealTimeAnalysis {
         setTalkersNumbers();
         JFreeChart talkerChart = ChartFactory.createPieChart("Top Talkers",talkersDataset,true,true,false);
         PiePlot pie= (PiePlot) talkerChart.getPlot();
-        System.out.println("before frame");
         ChartFrame talkerPieChart = new ChartFrame("Top Talkers",talkerChart);
         talkerPieChart.setBounds(100,100,500,500);
         talkerPieChart.setVisible(true);
-        System.out.println("true frame");
         javax.swing.Timer timer = new javax.swing.Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -171,10 +166,9 @@ public class RealTimeAnalysis {
     }
 
     private static void setProtocolNumbers() {
-        System.out.println("creating chart");
         for(int i = indexProtocol ; i< indexProtocol+100 && i<GUI.data.length;i++){
             if(GUI.data[i][4]!=null){
-                System.out.println(GUI.data[i][5]);
+//                System.out.println(GUI.data[i][5]);
                 if(GUI.data[i][4].equals("TCP")) tcp++;
                 if(GUI.data[i][4].equals("UDP")) udp++;
                 if(GUI.data[i][4].equals("HTTPS")) https++;

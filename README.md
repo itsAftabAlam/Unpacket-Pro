@@ -17,7 +17,7 @@ To use the project, follow these steps:
 1. Download the jar file or the appropriate executable for your machine from the releases page.
 2. Run the downloaded jar or executable file.
 
-If you have downloaded jar, make sure your machine have JDK installed.
+If you have downloaded jar, make sure your machine have the latest JDK (JDK 20 and onwards) installed.
 That's it! After downloading the executable or the jar file, you can directly run it to use the application without any additional installation steps.
 
 ### Developer

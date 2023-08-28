@@ -98,15 +98,17 @@ public class PacketDetails {
     public static void setDataField(PcapPacket packet) {
         int startIndex = packet.toString().indexOf("Hex stream");
         int endIndex = packet.toString().length();
-        String data = packet.toString().substring(startIndex,endIndex);
+        String data = "Hex Stream Not Available";
+        if(startIndex!=-1) data = packet.toString().substring(startIndex,endIndex); //if hex stream available then update data
         GUI.dataField.setText(data);
-        GUI.dataField.updateUI();
+        GUI.dataField.repaint();
     }
 
     public static void setDetails(PcapPacket packet) {
+        String details = packet.toString();
         int endIndex = packet.toString().indexOf("Hex stream");
-        String details = packet.toString().substring(0,endIndex);
+        if(endIndex!=-1) details = packet.toString().substring(0,endIndex); //if hex stream available then display it separately
         GUI.details.setText(details);
-        GUI.details.updateUI();
+        GUI.details.repaint();
     }
 }

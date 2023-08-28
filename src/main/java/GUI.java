@@ -85,8 +85,8 @@ public class GUI extends Thread implements ActionListener {
                         data[sno][4] = protocol;
                         data[sno][5] = length;
                         sno++;
-                        table.updateUI();
-                        scrollPane.updateUI();
+                        table.repaint();
+                        scrollPane.repaint();
                     }
                 }
             };
@@ -322,8 +322,10 @@ public class GUI extends Thread implements ActionListener {
             public void valueChanged(ListSelectionEvent e) {
                 int rowIndex = table.getSelectedRow();
                 if(!e.getValueIsAdjusting() && rowIndex!=-1){
-                    PacketDetails.setDataField(packetList[rowIndex]);
-                    PacketDetails.setDetails(packetList[rowIndex]);
+                    if(packetList[rowIndex]!=null){
+                        PacketDetails.setDataField(packetList[rowIndex]);
+                        PacketDetails.setDetails(packetList[rowIndex]);
+                    }
                 }
             }
         });

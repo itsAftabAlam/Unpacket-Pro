@@ -17,8 +17,10 @@ To use the project, follow these steps:
 1. Download the jar file or the appropriate executable for your machine from the releases page.
 2. Run the downloaded jar or executable file.
 
-If you have downloaded jar, make sure your machine have the latest JDK (JDK 20 and onwards) installed.
+If you have downloaded jar, make sure your machine have the latest JDK (JDK 8 and onwards) installed.
 That's it! After downloading the executable or the jar file, you can directly run it to use the application without any additional installation steps.
+
+Note: As of now only jar file is available. Executable file for the application will be coming soon.
 
 ### Developer
 Please refer contributing. Follow step 1 to step 7 mentioned in setup.
@@ -31,8 +33,8 @@ If you want to contribute to the project, follow these steps:
   ```bash
   git clone https://github.com/your-username/Unpacket-Pro.git
   ```
-3. Install JDK (Java Development Kit) if you haven't already. You can download it from the official Oracle website or use a package manager for your operating system.
-4. Install Apache Maven if you haven't already. You can download it from the official Apache Maven website or use a package manager for your operating system.
+3. Install JDK (Java Development Kit) version 8 and onwards if you haven't already. You can download it from the official Oracle website or use a package manager for your operating system.
+4. Install the latest Apache Maven if you haven't already. You can download it from the official Apache Maven website or use a package manager for your operating system.
 
 5. Navigate to the project directory:
   ```bash
@@ -55,6 +57,9 @@ If you want to contribute to the project, follow these steps:
 2. Make your changes or additions to the codebase.
 3. Write clear, concise, and meaningful commit messages.
 4. Push your changes to your forked repository and submit a pull request from your branch to the main branch of the original repository.
+
+## Feedback
+If you encounter any issues with the project or find a bug, or have suggestions for new features and improvements in existing project then go to [Issues](https://github.com/itsAftabAlam/Unpacket-Pro/issues).
 
 ## License
 [GPL-3.0 License](LICENSE)
